@@ -40,7 +40,7 @@ jobs:
         run: |
             LATEST_TAG=$(cat latest_tag.txt)
             CURRENT_TIME=$(cat current_time.txt)
-            . ./settings/settings.ini
+            . ./settings/settings.sh
             echo "id=${MODULE_ID}" > module.prop
             echo "name=${MODULE_NAME}" >> module.prop
             echo "version=${LATEST_TAG}" >> module.prop

@@ -8,6 +8,14 @@
 # shellcheck disable=SC2164
 MODPATH="$1"
 NOW_PATH="$2"
+
+
+main() {
+    echo ""
+    # your code here
+}
+
+
 abort() {
     echo "$1"
     exit 1
@@ -21,32 +29,27 @@ print_KEY_title() {
     echo ""
     key_select
 }
-
-main() {
-    if [ ! -f "$NOW_PATH/settings/settings.sh" ]; then
-        abort "Notfound File!!!(settings.sh)"
-    else
-        # shellcheck source=/dev/null
-        . "$NOW_PATH/settings/settings.sh"
-    fi
-    if [ ! -f "$NOW_PATH/$langpath" ]; then
-        abort "Notfound File!!!($langpath)"
-    else
-        # shellcheck disable=SC1090
-        . "$NOW_PATH/$langpath"
-        eval "lang_$print_languages"
-    fi
-    if [ ! -f "$NOW_PATH/$script_path" ]; then
-        abort "Notfound File!!!($script_path)"
-    else
-        # shellcheck disable=SC1090
-        . "$NOW_PATH/$script_path"
-    fi
-}
+if [ ! -f "$NOW_PATH/settings/settings.sh" ]; then
+    abort "Notfound File!!!(settings.sh)"
+else
+    # shellcheck source=/dev/null
+    . "$NOW_PATH/settings/settings.sh"
+fi
+if [ ! -f "$NOW_PATH/$langpath" ]; then
+    abort "Notfound File!!!($langpath)"
+else
+    # shellcheck disable=SC1090
+    . "$NOW_PATH/$langpath"
+    eval "lang_$print_languages"
+fi
+if [ ! -f "$NOW_PATH/$script_path" ]; then
+    abort "Notfound File!!!($script_path)"
+else
+    # shellcheck disable=SC1090
+    . "$NOW_PATH/$script_path"
+fi
 main
-echo -e "\033[32m$USER_START\033[0m"
 echo ""
-
 rm -rf "$NOW_PATH"
 echo -e "\033[32;49;1m [DONE] \033[39;49;0m"
 exit 0

@@ -46,6 +46,7 @@ detect_environment
 VERSION=$(grep "version" "$MODPATH/module.prop" | awk -F'=' '{print $2}' | awk 'NR==1')
 echo "Module Version: $VERSION"
 echo ""
-cp -r "$MODPATH"/ "$NOW_PATH"/
+mkdir -p "$NOW_PATH"/AMMF/
+cp -r "$MODPATH"/* "$NOW_PATH"/AMMF/
 chmod -R 755 "$NOW_PATH"/settings/
-ASH_STANDALONE=1 $BUSYBOX_PATH sh "$NOW_PATH"/settings/script/User.sh "$MODPATH" "$NOW_PATH"
+ASH_STANDALONE=1 $BUSYBOX_PATH sh "$NOW_PATH"/settings/script/User.sh "$MODPATH" "$NOW_PATH/AMMF"
