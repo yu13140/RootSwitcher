@@ -285,3 +285,32 @@ number_select() {
         fi
     done
 }
+webui_select() {
+    touch "$MODPATH"/settings/script/webroot/selected_file.txt
+    chmod 666 "$MODPATH"/settings/script/webroot/selected_file.txt
+    cp "$1" "$MODPATH/settings/script/webroot/file_list.txt"
+    if [ ! -f "$1" ]; then
+        Aurora_ui_print "文件列表 $1 不存在，请创建它并每行写入一个文件名。"
+        exit 1
+    fi
+    Aurora_ui_print "启动 WebUI，请访问 http://localhost:$PORT"
+    WEBROOT="$MODPATH/settings/script/webroot"
+    PORT=1146
+    IP="127.0.0.1"
+    httpd -f -p "$IP:$PORT" -h "$WEBROOT" &
+
+    # 检查服务是否成功启动
+    if ! netstat -an | grep "$PORT" | grep LISTEN >/dev/null 2>&1; then
+        Aurora_abort "HTTP 服务未能成功启动，请检查配置或端口是否被占用。" "12"
+    fi
+
+    # 打开默认浏览器访问地址
+    URL="http://$IP:$PORT/index.html"
+    am start -a android.intent.action.VIEW -d "$URL" >/dev/null 2>&1
+    wait
+    SELECTED_FILE=$(cat selected_file.txt)
+    echo "用户选择的文件是: $SELECTED_FILE"
+    kill %1
+    rm -f selected_file.txt
+    rm -f file_list.txt
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件选择器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #file-list {
+            margin-top: 20px;
+        }
+        .file-item {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .file-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>文件选择器</h1>
+    <div id="file-list">
+        <!-- 文件列表将动态加载到这里 -->
+    </div>
+
+    <script>
+        // 加载文件列表
+        async function loadFileList() {
+            const response = await fetch('files.txt');
+            const text = await response.text();
+            const files = text.split('\n').filter(line => line.trim() !== '');
+
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = ''; // 清空现有内容
+
+            files.forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.textContent = file;
+                div.onclick = () => {
+                    // 将选择结果保存到文件
+                    fetch('/selected_file.txt', {
+                        method: 'POST',
+                        body: file,
+                    }).then(() => {
+                        alert(`您选择了: ${file}`);
+                        window.close(); // 关闭浏览器窗口（可选）
+                    });
+                };
+                fileList.appendChild(div);
+            });
+        }
+
+        // 页面加载时加载文件列表
+        window.onload = loadFileList;
+    </script>
+</body>
+</html>
