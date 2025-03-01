@@ -1,0 +1,71 @@
+name: 反馈Bug
+description: 请提供详细的Bug报告，以便我们能够更快地解决问题。
+title: "[Bug] 标题简要描述问题"
+labels: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您提交Bug报告！请填写以下信息，以帮助我们更好地了解和解决问题。
+
+  - type: checkboxes
+    attributes:
+       label: Please check before submitting an issue
+       options:
+          - label: 我使用的本模块已经更新到最新版本了？
+            required: false
+
+          - label: 我使用的本模块是Action CI build 版本？
+            required: false
+
+          - label: 我使用的Magisk或KernelSU或APatch已更新到最新版本？
+            required: false
+
+          - label: 关于自定义脚本的问题？
+            required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: 环境
+      description: 请描述您所使用的Magisk或KernelSU或APatch及其版本等信息。
+      placeholder: 例如：Magisk v28.1
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 请详细描述您遇到的问题。
+      placeholder: 请在此输入问题的详细描述。
+    validations:
+        required: true
+
+  - type: textarea
+    id: expected_result
+    attributes:
+      label: 预期结果
+      description: 请描述您预期的结果。
+      placeholder: 应该成功执行脚本，无任何错误提示，并且按预期工作，安装模块等。
+
+  - type: textarea
+    id: actual_result
+    attributes:
+      label: 实际结果
+      description: 请描述实际发生的结果。
+      placeholder: 出现错误提示，或者无任何反应，或者模块无法正常工作等。
+
+  - type: input
+    id: screenshot
+    attributes:
+      label: 截图
+      description: 如果有相关截图，请提供链接或附件。
+      placeholder: 请提供截图链接或附件
+    validations:
+        required: true
+        
+  - type: textarea
+    id: install_log
+    attributes:
+      label: 安装日志
+      description: 管理器的安装日志附件。
+      placeholder: 请提供截图附件
