@@ -153,22 +153,23 @@ select_on_magisk() {
     group_chars="$MODPATH/TEMP/group_chars.tmp"
     # 主循环处理每个字符位置
     while [ "$(wc -l <"$CURRENT_FILES")" -gt 1 ]; do
-        # 提取当前字符位置的大写字母并去重
+        # 处理第N个字符
         cut -c "$CHAR_POS" "$CURRENT_FILES" | tr '[:lower:]' '[:upper:]' | sort -u >"$current_chars"
 
-        # 获取字符数量和内容
         CHAR_COUNT=$(wc -l <"$current_chars")
         CHARS=$(tr '\n' ' ' <"$current_chars")
 
-        # 自动处理唯一字符情况
         if [ "$CHAR_COUNT" -eq 1 ]; then
+            # 自动选择唯一字符
             SELECTED_CHAR=$(head -1 "$current_chars")
+            show_menu "自动选择第 $CHAR_POS 位字符：" "--> $SELECTED_CHAR"
+            sleep 1
         else
-            # 生成可用分组
+            # 显示分组选择
             GROUP_ORDER="A-G H-M N-T U-Z Other"
             AVAILABLE_GROUPS=""
 
-            # 检查每个分组是否存在字符
+            # 生成可用分组列表
             for GROUP in $GROUP_ORDER; do
                 case $GROUP in
                 "A-G") PATTERN="[A-G]" ;;
@@ -177,17 +178,22 @@ select_on_magisk() {
                 "U-Z") PATTERN="[U-Z]" ;;
                 "Other") PATTERN="[^A-Z]" ;;
                 esac
-
                 grep -q -E "$PATTERN" "$current_chars" && AVAILABLE_GROUPS="$AVAILABLE_GROUPS $GROUP"
             done
 
-            # 用户选择分组
+            # 分组选择交互
             GROUP_INDEX=0
             AVAILABLE_GROUPS=$(echo "$AVAILABLE_GROUPS" | sed 's/^ //')
             NUM_GROUPS=$(echo "$AVAILABLE_GROUPS" | wc -w)
 
             while true; do
                 CURRENT_GROUP=$(echo "$AVAILABLE_GROUPS" | cut -d ' ' -f $((GROUP_INDEX + 1)))
+
+                # 显示分组菜单
+                show_menu "选择第 $CHAR_POS 位字母分组：" \
+                    "当前候选字母: $CHARS" \
+                    "> $CURRENT_GROUP" \
+                    $(echo "$AVAILABLE_GROUPS" | sed "s/$CURRENT_GROUP/[ $CURRENT_GROUP ]/")
 
                 key_select
                 case "$key_pressed" in
@@ -198,7 +204,7 @@ select_on_magisk() {
                 esac
             done
 
-            # 获取分组内字符
+            # 处理分组内字符选择
             case "$CURRENT_GROUP" in
             "A-G") PATTERN="[A-G]" ;;
             "H-M") PATTERN="[H-M]" ;;
@@ -211,10 +217,16 @@ select_on_magisk() {
             GROUP_CHARS=$(tr '\n' ' ' <"$group_chars")
             NUM_CHARS=$(wc -w <"$group_chars")
 
-            # 用户选择字符
+            # 字符选择交互
             CHAR_INDEX=0
             while true; do
                 CURRENT_CHAR=$(echo "$GROUP_CHARS" | cut -d ' ' -f $((CHAR_INDEX + 1)))
+
+                # 显示字符菜单
+                show_menu "选择第 $CHAR_POS 位字符：" \
+                    "分组: $CURRENT_GROUP" \
+                    "> $CURRENT_CHAR" \
+                    $(echo "$GROUP_CHARS" | sed "s/$CURRENT_CHAR/[ $CURRENT_CHAR ]/g")
 
                 key_select
                 case "$key_pressed" in
@@ -236,17 +248,28 @@ select_on_magisk() {
             current = toupper(substr($0, pos, 1))
             if (current == toupper(char)) print
         }
-    ' "$CURRENT_FILES" >"$filtered_files"
+    ' "$CURRENT_FILES" >"$filtered"
 
-        mv "$filtered_files" "$CURRENT_FILES"
+        mv "$filtered" "$CURRENT_FILES"
         CHAR_POS=$((CHAR_POS + 1))
     done
 
-    # 输出最终结果
     cat "$CURRENT_FILES"
     rm -f "$MODPATH"/TEMP/*.tmp 2>/dev/null
 }
-
+show_menu() {
+    clear
+    echo "=============================="
+    echo "$1"
+    echo "------------------------------"
+    shift
+    while [ $# -gt 0 ]; do
+        echo "  $1"
+        shift
+    done
+    echo "=============================="
+    echo "VOL+ 选择 | VOL- 下一个选项"
+}
 # 数字选择函数
 number_select() {
     CURRENT_FILES="$MODPATH/TEMP/current_files.tmp"
