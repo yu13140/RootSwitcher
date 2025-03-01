@@ -50,11 +50,11 @@ jobs:
             echo "author=AuroraNasa" >> module.prop
             echo "description=${MODULE_DES}" >> module.prop
             cat module.prop
-            7z a -r -mx9 "ARMIAS_${LATEST_TAG}_${GITHUB_SHA:0:7}.zip" * -x!*.git* -x!*.zip -x!latest_tag.txt -x!current_time.txt
+            7z a -r -mx9 "${MODULE_NAME}_${LATEST_TAG}_${GITHUB_SHA:0:7}.zip" * -x!*.git* -x!*.zip -x!latest_tag.txt -x!current_time.txt
 
       - name: Upload zip files as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ARMIAS_all_languages_versions
+          name: ${{ github.event.repository.name }}
           path: |
             *.zip

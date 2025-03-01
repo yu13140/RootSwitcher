@@ -48,10 +48,10 @@ jobs:
             echo "author=AuroraNasa" >> module.prop
             echo "description=${MODULE_DES}" >> module.prop
             cat module.prop
-            7z a -r -mx9 "ARMIAS_${LATEST_TAG}.zip" * -x!*.git* -x!*.zip -x!latest_tag.txt -x!current_time.txt
+            7z a -r -mx9 "${MODULE_NAME}_${LATEST_TAG}.zip" * -x!*.git* -x!*.zip -x!latest_tag.txt -x!current_time.txt
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ARMIAS_*.zip
+            ${{ github.event.repository.name }}_*.zip
