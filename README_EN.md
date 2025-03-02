@@ -1,5 +1,10 @@
 [简体中文](README.md) | [English](README_EN.md)
 
+<div style="display: flex; justify-content: space-between;">
+    <img src="https://img.shields.io/github/downloads/Aurora-Nasa-1/AMLL/total" alt="GitHub Downloads (all assets, all releases)" style="margin-right: 10px;">
+    <img src="https://img.shields.io/github/license/Aurora-Nasa-1/AMLL" alt="GitHub License">
+</div>
+
 # 🚀 Quick Start
 
 Welcome to use this module framework! Here are the steps to get started:
