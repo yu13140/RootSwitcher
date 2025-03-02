@@ -5,7 +5,10 @@
 # shellcheck disable=SC2155
 # shellcheck disable=SC2046
 # shellcheck disable=SC3045
-
+if [ -z "$NOW_PATH" ]; then
+    NOW_PATH="$MODPATH"
+    SH_NOTMAGISK=true
+fi
 key_select() {
     key_pressed=""
     while true; do
