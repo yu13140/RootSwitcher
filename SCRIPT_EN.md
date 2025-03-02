@@ -14,7 +14,6 @@
   - Call this function `number_select` and pass a path variable, for example `/your/path.txt`.
   - The user selects an option from the list, and the selected number is returned in the `$SELECT_OUTPUT` variable.
   - Only supported for use in user scripts.
-  - Does not support special characters or Chinese (compatible with `/][{};:><?!()_-+=.`).
 
 
 - **download_file [input URL]**
