@@ -36,7 +36,7 @@ jobs:
             LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
             echo "$LATEST_TAG" > latest_tag.txt
 
-      - name: Compress repository for each language version
+      - name: Make module.prop and compress files
         run: |
             LATEST_TAG=$(cat latest_tag.txt)
             CURRENT_TIME=$(cat current_time.txt)

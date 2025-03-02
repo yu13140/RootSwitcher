@@ -38,7 +38,7 @@ jobs:
               LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
               echo "$LATEST_TAG" > latest_tag.txt
 
-      - name: Compress repository for each language version
+      - name: Make module.prop
         run: |
             LATEST_TAG=$(cat latest_tag.txt)
             CURRENT_TIME=$(cat current_time.txt)
@@ -53,9 +53,12 @@ jobs:
             rm latest_tag.txt
             rm current_time.txt
 
+      - name: Set short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+          
       - name: Upload zip files as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.repository.name }}_${{ github.sha.slice(0, 7) }}
+          name: ${{ github.event.repository.name }}_${{ env.SHORT_SHA }}
           path: |
             *
