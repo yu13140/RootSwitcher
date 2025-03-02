@@ -251,7 +251,7 @@ select_on_magisk() {
     done
 
     SELECT_OUTPUT=$(cat "$CURRENT_FILES")
-    echo "选择结果：$SELECT_OUTPUT"
+    Aurora_ui_print "选择结果：$SELECT_OUTPUT"
     rm -f "$MODPATH"/TEMP/*.tmp 2>/dev/null
 }
 show_menu() {
@@ -333,5 +333,5 @@ number_select() {
         fi
     done
     SELECT_OUTPUT=$(cat "$selected")
-    echo "选择结果：$SELECT_OUTPUT"
+    Aurora_ui_print "选择结果：$SELECT_OUTPUT"
 }
