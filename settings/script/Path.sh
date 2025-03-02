@@ -277,11 +277,12 @@ number_select() {
     mkdir -p "$NOW_PATH/TEMP"
     CURRENT_FILES="$NOW_PATH/TEMP/current_files.tmp"
     # 初始化文件列表
-    cp "1" "$CURRENT_FILES"
+    cp "$1" "$CURRENT_FILES"
     selected="$NOW_PATH/TEMP/selected.tmp"
     clear
-    echo "可用文件列表："
-    nl -w 3 -n rz -s " " "$CURRENT_FILES"
+    echo "可用列表："
+    cat -n "$CURRENT_FILES"
+    sed -i -e '$a\' "$CURRENT_FILES"
 
     # 获取有效数字范围
     total=$(wc -l <"$CURRENT_FILES")
@@ -305,6 +306,7 @@ number_select() {
             # 提取选择结果
             awk -v line="$num" 'NR == line' "$CURRENT_FILES" >"$selected"
             mv "$selected" "$CURRENT_FILES"
+            echo "选择结果：" && cat "$selected"
             return 0
         else
             echo "超出范围！"
