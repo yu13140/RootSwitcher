@@ -327,11 +327,11 @@ number_select() {
             # 提取选择结果
             awk -v line="$num" 'NR == line' "$CURRENT_FILES" >"$selected"
             mv "$selected" "$CURRENT_FILES"
+            SELECT_OUTPUT=$(cat "$selected")
+     Aurora_ui_print "$RESULT_TITLE $SELECT_OUTPUT"
             return 0
         else
             echo "$ERROR_OUT_OF_RANGE"
         fi
     done
-    SELECT_OUTPUT=$(cat "$selected")
-     Aurora_ui_print "$RESULT_TITLE $SELECT_OUTPUT"
 }
