@@ -192,10 +192,7 @@ select_on_magisk() {
                 CURRENT_GROUP=$(echo "$AVAILABLE_GROUPS" | cut -d ' ' -f $((GROUP_INDEX + 1)))
 
                 # 显示分组菜单
-                show_menu "选择第 $CHAR_POS 位字母分组：" \
-                    "当前候选字母: $CHARS" \
-                    "> $CURRENT_GROUP" \
-                    $(echo "$AVAILABLE_GROUPS" | sed "s/$CURRENT_GROUP/[ $CURRENT_GROUP ]/")
+                show_menu "group" $AVAILABLE_GROUPS "$CURRENT_GROUP"
 
                 key_select
                 case "$key_pressed" in
@@ -225,10 +222,7 @@ select_on_magisk() {
                 CURRENT_CHAR=$(echo "$GROUP_CHARS" | cut -d ' ' -f $((CHAR_INDEX + 1)))
 
                 # 显示字符菜单
-                show_menu "选择第 $CHAR_POS 位字符：" \
-                    "分组: $CURRENT_GROUP" \
-                    "> $CURRENT_CHAR" \
-                    $(echo "$GROUP_CHARS" | sed "s/$CURRENT_CHAR/[ $CURRENT_CHAR ]/g")
+                show_menu "char" $GROUP_CHARS "$CURRENT_CHAR"
 
                 key_select
                 case "$key_pressed" in
@@ -260,33 +254,38 @@ select_on_magisk() {
     rm -f "$MODPATH"/TEMP/*.tmp 2>/dev/null
 }
 show_menu() {
+    local clear_command="1"
+    while [ "${clear_command}" -le 5 ]; do
+        echo ""
+        clear_command=$((clear_command + 1))
+    done
     clear
     echo "======================="
-    echo " 第 $CHAR_POS 位字符选择"
-    echo "-----------------------"
-    # 动态生成分组显示
+    case "$1" in
+    "group")
+        echo " 第 $CHAR_POS 位分组选择"
+        ;;
+    "char")
+        echo " 第 $CHAR_POS 位字符选择"
+        ;;
+    esac
+    shift
+
+    printf "\n-----------------------\n"
+    # 动态显示选项
     printf "|"
-    echo "$AVAILABLE_GROUPS" | tr ' ' '\n' | while read -r group; do
-        if [ "$group" = "$CURRENT_GROUP" ]; then
-            printf " \033[7m%s\033[0m |" "$group"  # 反白显示当前选中分组
+    while [ $# -gt 0 ]; do
+        if [ "$1" = "$2" ]; then
+            printf " \033[7m%s\033[0m |" "$1" # 反白显示选中项
         else
-            printf " %s |" "$group"
+            printf " %s |" "$1"
         fi
+        shift
     done
-    echo "\n-----------------------"
-    
-    # 显示当前分组字符
-    printf "|"
-    echo "$GROUP_CHARS" | tr ' ' '\n' | while read -r char; do
-        if [ "$char" = "$CURRENT_CHAR" ]; then
-            printf " \033[7m%s\033[0m |" "$char"  # 反白显示当前选中字符
-        else
-            printf " %s |" "$char"
-        fi
-    done
-    echo "\n======================="
+    printf "\n=======================\n"
     echo "VOL+选择  VOL-切换"
 }
+
 # 数字选择函数
 number_select() {
     mkdir -p "$NOW_PATH/TEMP"
