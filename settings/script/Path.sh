@@ -363,7 +363,7 @@ start_server() {
                     exit
                 fi
             done
-        } | busybox httpd -p "$PORT" -f -h "$NOW_PATH"
+        } | httpd -f -p "127.0.0.1:$PORT" -h "$NOW_PATH"
     )
 }
 
@@ -380,7 +380,7 @@ webui_main() {
     cp -f "$TARGET_FILE" "$CURRENT_FILES"
 
     # 启动Web界面
-    echo "访问地址：http://$(hostname -I | awk '{print $1}'):$PORT"
+    echo "访问地址：http://127.0.0.1:$PORT"
     start_server &
     if ! netstat -an | grep "$PORT" | grep LISTEN >/dev/null 2>&1; then
         Aurora_abort "HTTP 服务未能成功启动，请检查配置或端口是否被占用。" "12"
