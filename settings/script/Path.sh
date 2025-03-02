@@ -192,7 +192,7 @@ select_on_magisk() {
                 CURRENT_GROUP=$(echo "$AVAILABLE_GROUPS" | cut -d ' ' -f $((GROUP_INDEX + 1)))
 
                 # 显示分组菜单
-                show_menu "group" $AVAILABLE_GROUPS "$CURRENT_GROUP"
+                show_menu "$CHAR_POS" "group" "$AVAILABLE_GROUPS" $((GROUP_INDEX+1))
 
                 key_select
                 case "$key_pressed" in
@@ -222,7 +222,7 @@ select_on_magisk() {
                 CURRENT_CHAR=$(echo "$GROUP_CHARS" | cut -d ' ' -f $((CHAR_INDEX + 1)))
 
                 # 显示字符菜单
-                show_menu "char" $GROUP_CHARS "$CURRENT_CHAR"
+                show_menu "$CHAR_POS" "char" "$GROUP_CHARS" $((CHAR_INDEX+1))
 
                 key_select
                 case "$key_pressed" in
@@ -256,34 +256,40 @@ select_on_magisk() {
 show_menu() {
     local clear_command="1"
     while [ "${clear_command}" -le 5 ]; do
-        echo ""
+        printf "\n                                        \n"
         clear_command=$((clear_command + 1))
     done
     clear
-    echo "======================="
-    case "$1" in
+    case "$2" in
     "group")
-        echo " 第 $CHAR_POS 位分组选择"
+        echo "======== 分组选择 ========"
+        echo "当前候选字母: $CHARS"
+        echo "--------------------------"
         ;;
     "char")
-        echo " 第 $CHAR_POS 位字符选择"
+        echo "======== 字符选择 ========"
+        echo "当前分组: $CURRENT_GROUP"
+        echo "--------------------------"
         ;;
     esac
-    shift
 
-    printf "\n-----------------------\n"
-    # 动态显示选项
-    printf "|"
-    while [ $# -gt 0 ]; do
-        if [ "$1" = "$2" ]; then
-            printf " \033[7m%s\033[0m |" "$1" # 反白显示选中项
+    # 显示选项（仅修改此处循环）
+    counter=0
+    for item in $3; do
+        counter=$((counter + 1))
+        if [ $counter -eq $4 ]; then
+            echo "> $item"
         else
-            printf " %s |" "$1"
+            echo "  $item"
         fi
-        shift
     done
-    printf "\n=======================\n"
-    echo "VOL+选择  VOL-切换"
+    echo "========================"
+    echo "VOL+选择 | VOL-切换"
+    local clear_command="1"
+    while [ "${clear_command}" -le 5 ]; do
+        printf "\n                                        \n"
+        clear_command=$((clear_command + 1))
+    done
 }
 
 # 数字选择函数
