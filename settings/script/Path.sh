@@ -312,31 +312,89 @@ number_select() {
     done
 }
 webui_select() {
-    selected_file="$NOW_PATH/settings/script/webroot/selected_file.txt"
-    touch "$selected_file"
-    chmod 666 "$selected_file"
-    cp "$1" "$NOW_PATH/settings/script/webroot/file_list.txt"
-    if [ ! -f "$1" ]; then
-        Aurora_ui_print "文件列表 $1 不存在，请创建它并每行写入一个文件名。"
-        exit 1
-    fi
-    PORT=1146
-    IP="127.0.0.1"
-    Aurora_ui_print "启动 WebUI，请访问 http://localhost:$PORT"
-    WEBROOT="$NOW_PATH/settings/script/webroot"
-    httpd -f -p "$IP:$PORT" -h "$WEBROOT" &
+    TARGET_FILE="$1"
+    OUTPUT_FILE="$NOW_PATH/selected.txt"
+    PORT=1547
+    webui_main
+}
 
-    # 检查服务是否成功启动
+gen_webpage() {
+    cat <<EOF
+HTTP/1.0 200 OK
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>文件选择器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {font-family: Arial, sans-serif; margin:0; padding:20px;}
+        .item {padding:10px; border-bottom:1px solid #ddd; cursor:pointer;}
+        .item:hover {background:#f8f8f8;}
+    </style>
+</head>
+<body>
+    <h2>当前路径：$NOW_PATH</h2>
+    $(cd "$NOW_PATH" && awk '{print "<div class=\"item\" onclick=\"selectItem(\x27" $0 "\x27)\">" $0 "</div>"}' files.txt)
+    <script>
+    function selectItem(v) {
+        fetch('/select?q='+encodeURIComponent(v))
+        .then(() => window.close())
+    }
+    </script>
+</body>
+</html>
+EOF
+}
+
+# 启动HTTP服务器
+start_server() {
+    (
+        cd "$NOW_PATH" || exit 1
+        {
+            gen_webpage
+            while read -r line; do
+                if echo "$line" | grep -q "GET /select"; then
+                    # 提取选择参数
+                    echo "$line" | awk -F'[?&= ]' '{for(i=1;i<=NF;i++){if($i~/^q=/){print substr($i,3);exit}}}' |
+                        sed 's/+/ /g; s/%/\\x/g' | xargs -0 printf "%b" >"$OUTPUT_FILE"
+                    printf "HTTP/1.0 204 No Content\r\n\r\n"
+                    exit
+                fi
+            done
+        } | busybox httpd -p "$PORT" -f -h "$NOW_PATH"
+    )
+}
+
+# 主流程
+webui_main() {
+    # 创建锁文件
+    [ -f "$LOCK_FILE" ] && {
+        echo "已有进程在运行"
+        exit 1
+    }
+    touch "$LOCK_FILE"
+
+    # 初始化文件
+    cp -f "$TARGET_FILE" "$CURRENT_FILES"
+
+    # 启动Web界面
+    echo "访问地址：http://$(hostname -I | awk '{print $1}'):$PORT"
+    start_server &
     if ! netstat -an | grep "$PORT" | grep LISTEN >/dev/null 2>&1; then
         Aurora_abort "HTTP 服务未能成功启动，请检查配置或端口是否被占用。" "12"
     fi
+    # 等待选择结果
+    while :; do
+        [ -s "$OUTPUT_FILE" ] && break
+        sleep 1
+    done
 
-    # 打开默认浏览器访问地址
-    URL="http://$IP:$PORT/index.html"
-    am start -a android.intent.action.VIEW -d "$URL" >/dev/null 2>&1
-    SELECTED_FILE=$(cat "$selected_file")
-    echo "用户选择的文件是: $SELECTED_FILE"
-    kill %1
-    rm -f "$selected_file"
-    rm -f "$NOW_PATH/settings/script/webroot/file_list.txt"
+    # 清理
+    pkill -f "busybox httpd.*$NOW_PATH"
+    rm -f "$LOCK_FILE" "$CURRENT_FILES"
+
+    # 输出结果
+    echo "用户选择：$(cat "$OUTPUT_FILE")"
 }
