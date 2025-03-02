@@ -143,14 +143,16 @@ download_file() {
 # 文件列表
 select_on_magisk() {
     # 初始化文件列表和位置
-    CURRENT_FILES="$MODPATH/TEMP/current_files.tmp"
+    mkdir -p "$NOW_PATH/TEMP"
+    CURRENT_FILES="$NOW_PATH/TEMP/current_files.tmp"
     CHAR_POS=1
 
     # 初始化当前文件列表
     cp "$1" "$CURRENT_FILES"
-    filtered_files="$MODPATH/TEMP/filtered.tmp"
-    current_chars="$MODPATH/TEMP/current_chars.tmp"
-    group_chars="$MODPATH/TEMP/group_chars.tmp"
+    filtered_files="$NOW_PATH/TEMP/filtered.tmp"
+    filtered="$NOW_PATH/TEMP/filtered.tmp"
+    current_chars="$NOW_PATH/TEMP/current_chars.tmp"
+    group_chars="$NOW_PATH/TEMP/group_chars.tmp"
     # 主循环处理每个字符位置
     while [ "$(wc -l <"$CURRENT_FILES")" -gt 1 ]; do
         # 处理第N个字符
@@ -272,10 +274,11 @@ show_menu() {
 }
 # 数字选择函数
 number_select() {
-    CURRENT_FILES="$MODPATH/TEMP/current_files.tmp"
+    mkdir -p "$NOW_PATH/TEMP"
+    CURRENT_FILES="$NOW_PATH/TEMP/current_files.tmp"
     # 初始化文件列表
     cp "1" "$CURRENT_FILES"
-    selected="$MODPATH/TEMP/selected.tmp"
+    selected="$NOW_PATH/TEMP/selected.tmp"
     clear
     echo "可用文件列表："
     nl -w 3 -n rz -s " " "$CURRENT_FILES"
@@ -309,17 +312,18 @@ number_select() {
     done
 }
 webui_select() {
-    touch "$MODPATH"/settings/script/webroot/selected_file.txt
-    chmod 666 "$MODPATH"/settings/script/webroot/selected_file.txt
-    cp "$1" "$MODPATH/settings/script/webroot/file_list.txt"
+    selected_file="$NOW_PATH/settings/script/webroot/selected_file.txt"
+    touch "$selected_file"
+    chmod 666 "$selected_file"
+    cp "$1" "$NOW_PATH/settings/script/webroot/file_list.txt"
     if [ ! -f "$1" ]; then
         Aurora_ui_print "文件列表 $1 不存在，请创建它并每行写入一个文件名。"
         exit 1
     fi
-    Aurora_ui_print "启动 WebUI，请访问 http://localhost:$PORT"
-    WEBROOT="$MODPATH/settings/script/webroot"
     PORT=1146
     IP="127.0.0.1"
+    Aurora_ui_print "启动 WebUI，请访问 http://localhost:$PORT"
+    WEBROOT="$NOW_PATH/settings/script/webroot"
     httpd -f -p "$IP:$PORT" -h "$WEBROOT" &
 
     # 检查服务是否成功启动
@@ -330,10 +334,9 @@ webui_select() {
     # 打开默认浏览器访问地址
     URL="http://$IP:$PORT/index.html"
     am start -a android.intent.action.VIEW -d "$URL" >/dev/null 2>&1
-    wait
-    SELECTED_FILE=$(cat selected_file.txt)
+    SELECTED_FILE=$(cat "$selected_file")
     echo "用户选择的文件是: $SELECTED_FILE"
     kill %1
-    rm -f selected_file.txt
-    rm -f file_list.txt
+    rm -f "$selected_file"
+    rm -f "$NOW_PATH/settings/script/webroot/file_list.txt"
 }
