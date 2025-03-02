@@ -314,6 +314,8 @@ number_select() {
 webui_select() {
     TARGET_FILE="$1"
     OUTPUT_FILE="$NOW_PATH/selected.txt"
+    CURRENT_FILES="$NOW_PATH/current_files.txt"
+    LOCK_FILE="$NOW_PATH/process.lock"
     PORT=1547
     webui_main
 }
