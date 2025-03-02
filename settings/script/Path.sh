@@ -286,7 +286,7 @@ show_menu() {
     done
     echo "========================"
     echo "$MENU_INSTRUCTIONS"
-    
+
     local clear_command="1"
     while [ "${clear_command}" -le 5 ]; do
         printf "\n                                        \n"
@@ -328,7 +328,7 @@ number_select() {
             # 提取选择结果
             awk -v line="$num" 'NR == line' "$CURRENT_FILES" >"$selected"
             mv "$selected" "$CURRENT_FILES"
-            SELECT_OUTPUT=$(cat "$selected")
+            SELECT_OUTPUT=$(cat "$CURRENT_FILES")
             Aurora_ui_print "$RESULT_TITLE $SELECT_OUTPUT"
             return 0
         else
