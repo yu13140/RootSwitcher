@@ -261,16 +261,31 @@ select_on_magisk() {
 }
 show_menu() {
     clear
-    echo "=============================="
-    echo "$1"
-    echo "------------------------------"
-    shift
-    while [ $# -gt 0 ]; do
-        echo "  $1"
-        shift
+    echo "======================="
+    echo " 第 $CHAR_POS 位字符选择"
+    echo "-----------------------"
+    # 动态生成分组显示
+    printf "|"
+    echo "$AVAILABLE_GROUPS" | tr ' ' '\n' | while read -r group; do
+        if [ "$group" = "$CURRENT_GROUP" ]; then
+            printf " \033[7m%s\033[0m |" "$group"  # 反白显示当前选中分组
+        else
+            printf " %s |" "$group"
+        fi
     done
-    echo "=============================="
-    echo "VOL+ 选择 | VOL- 下一个选项"
+    echo "\n-----------------------"
+    
+    # 显示当前分组字符
+    printf "|"
+    echo "$GROUP_CHARS" | tr ' ' '\n' | while read -r char; do
+        if [ "$char" = "$CURRENT_CHAR" ]; then
+            printf " \033[7m%s\033[0m |" "$char"  # 反白显示当前选中字符
+        else
+            printf " %s |" "$char"
+        fi
+    done
+    echo "\n======================="
+    echo "VOL+选择  VOL-切换"
 }
 # 数字选择函数
 number_select() {
