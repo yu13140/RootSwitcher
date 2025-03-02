@@ -278,7 +278,7 @@ show_menu() {
     counter=0
     for item in $3; do
         counter=$((counter + 1))
-        if [ $counter -eq $4 ]; then
+        if [ $counter -eq "$4" ]; then
             echo "> $item"
         else
             echo "  $item"
@@ -286,6 +286,7 @@ show_menu() {
     done
     echo "========================"
     echo "$MENU_INSTRUCTIONS"
+    
     local clear_command="1"
     while [ "${clear_command}" -le 5 ]; do
         printf "\n                                        \n"
@@ -319,7 +320,7 @@ number_select() {
 
         # 验证输入有效性
         if [ -z "$num" ] || ! [ "$num" -eq "$num" ] 2>/dev/null; then
-           echo "$ERROR_OUT_OF_RANGE"
+            echo "$ERROR_OUT_OF_RANGE"
             continue
         fi
 
@@ -328,7 +329,7 @@ number_select() {
             awk -v line="$num" 'NR == line' "$CURRENT_FILES" >"$selected"
             mv "$selected" "$CURRENT_FILES"
             SELECT_OUTPUT=$(cat "$selected")
-     Aurora_ui_print "$RESULT_TITLE $SELECT_OUTPUT"
+            Aurora_ui_print "$RESULT_TITLE $SELECT_OUTPUT"
             return 0
         else
             echo "$ERROR_OUT_OF_RANGE"
