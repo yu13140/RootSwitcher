@@ -21,11 +21,13 @@
 
 - **请勿使用** `custmize.sh` 作为自定义安装脚本。
 - 应该选择 `./settings/custom_script.sh` 作为自定义脚本。
+- 本框架提供了一些函数，请阅读 [使用说明](SCRIPT.md)
 
 ## 🖱️ 用户脚本
 
 - `Click.sh` 可供用户在模块外执行模块提供的适用于用户的脚本，可改为 `action.sh`（Magisk内执行有某些限制）。
 - `Click.sh` 通过 `busybox` 实现使用 `./settings/script/User.sh`，在 `/data/local/tmp/` 内执行。
+- 本框架提供了一些函数，请阅读 [使用说明](SCRIPT.md)
 
 ## 🏗️ 框架适用性
 
@@ -37,3 +39,5 @@
 欢迎PR，如果觉得好用可以Star哦，感谢使用本框架！🚀
 
 （闲的没事从AuroraNasa_Installer里面提取修改弄出来的玩意，不喜勿喷）
+
+[def]: SCRIPT.md
