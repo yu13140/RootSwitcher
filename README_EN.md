@@ -10,10 +10,9 @@ Welcome to use this module framework! Here are the steps to get started:
 
 ## ⚙️ Configuration Settings
 
-1. Edit the `./settings/Settings.ini` file:
+1. Edit the `./settings/Settings.sh` file:
    - Write your module name and module description.
    - Specify the environment required by the module.
-   - Choose whether to use custom scripts.
 
 2. Edit the `./settings/languages.ini` file to enable multi-language support.
 

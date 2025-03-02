@@ -10,10 +10,9 @@
 
 ## ⚙️ 配置设置
 
-1. 编辑 `./settings/Settings.ini` 文件：
+1. 编辑 `./settings/Settings.sh` 文件：
    - 写入你的模块名称和模块介绍。
    - 指定模块要求的环境。
-   - 选择是否使用自定义脚本。
 
 2. 编辑 `./settings/languages.ini` 文件以实现多语言支持。
 
