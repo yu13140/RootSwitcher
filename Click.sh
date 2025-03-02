@@ -48,5 +48,5 @@ echo "Module Version: $VERSION"
 echo ""
 mkdir -p "$NOW_PATH"/AMMF/
 cp -r "$MODPATH"/* "$NOW_PATH"/AMMF/
-chmod -R 755 "$NOW_PATH"/settings/
-ASH_STANDALONE=1 $BUSYBOX_PATH sh "$NOW_PATH"/settings/script/User.sh "$MODPATH" "$NOW_PATH/AMMF"
+chmod -R 755 "$NOW_PATH"/AMMF/
+ASH_STANDALONE=1 $BUSYBOX_PATH sh "$NOW_PATH"/AMMF/settings/script/User.sh "$MODPATH" "$NOW_PATH/AMMF"
