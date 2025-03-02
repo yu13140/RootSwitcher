@@ -250,7 +250,8 @@ select_on_magisk() {
         CHAR_POS=$((CHAR_POS + 1))
     done
 
-    cat "$CURRENT_FILES"
+    SELECT_OUTPUT=$(cat "$CURRENT_FILES")
+    echo "选择结果：$SELECT_OUTPUT"
     rm -f "$MODPATH"/TEMP/*.tmp 2>/dev/null
 }
 show_menu() {
@@ -326,10 +327,11 @@ number_select() {
             # 提取选择结果
             awk -v line="$num" 'NR == line' "$CURRENT_FILES" >"$selected"
             mv "$selected" "$CURRENT_FILES"
-            echo "选择结果：" && cat "$selected"
             return 0
         else
             echo "超出范围！"
         fi
     done
+    SELECT_OUTPUT=$(cat "$selected")
+    echo "选择结果：$SELECT_OUTPUT"
 }
