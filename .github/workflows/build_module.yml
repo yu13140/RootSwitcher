@@ -22,9 +22,6 @@ jobs:
            mkdir -p files/patches/sdcard
            mkdir -p files/patches/data
            mkdir -p settings/
-      
-      - name: Install 7z
-        uses: edgarrc/action-7z@v1.0.5
 
       - name: Get current time
         run: |
