@@ -164,7 +164,7 @@ select_on_magisk() {
         if [ "$CHAR_COUNT" -eq 1 ]; then
             # 自动选择唯一字符
             SELECTED_CHAR=$(head -1 "$current_chars")
-            show_menu "自动选择第 $CHAR_POS 位字符：" "--> $SELECTED_CHAR"
+            show_menu "Auto Select $CHAR_POS " "--> $SELECTED_CHAR"
             sleep 1
         else
             # 显示分组选择
@@ -192,7 +192,7 @@ select_on_magisk() {
                 CURRENT_GROUP=$(echo "$AVAILABLE_GROUPS" | cut -d ' ' -f $((GROUP_INDEX + 1)))
 
                 # 显示分组菜单
-                show_menu "$CHAR_POS" "group" "$AVAILABLE_GROUPS" $((GROUP_INDEX+1))
+                show_menu "$CHAR_POS" "group" "$AVAILABLE_GROUPS" $((GROUP_INDEX + 1))
 
                 key_select
                 case "$key_pressed" in
@@ -222,7 +222,7 @@ select_on_magisk() {
                 CURRENT_CHAR=$(echo "$GROUP_CHARS" | cut -d ' ' -f $((CHAR_INDEX + 1)))
 
                 # 显示字符菜单
-                show_menu "$CHAR_POS" "char" "$GROUP_CHARS" $((CHAR_INDEX+1))
+                show_menu "$CHAR_POS" "char" "$GROUP_CHARS" $((CHAR_INDEX + 1))
 
                 key_select
                 case "$key_pressed" in
@@ -251,7 +251,7 @@ select_on_magisk() {
     done
 
     SELECT_OUTPUT=$(cat "$CURRENT_FILES")
-    Aurora_ui_print "选择结果：$SELECT_OUTPUT"
+    Aurora_ui_print "$RESULT_TITLE $SELECT_OUTPUT"
     rm -f "$MODPATH"/TEMP/*.tmp 2>/dev/null
 }
 show_menu() {
@@ -263,13 +263,13 @@ show_menu() {
     clear
     case "$2" in
     "group")
-        echo "======== 分组选择 ========"
-        echo "当前候选字母: $CHARS"
+        echo "$MENU_TITLE_GROUP"
+        echo "$MENU_CURRENT_CANDIDATES $CHARS"
         echo "--------------------------"
         ;;
     "char")
-        echo "======== 字符选择 ========"
-        echo "当前分组: $CURRENT_GROUP"
+        echo "$MENU_TITLE_CHAR"
+        echo "$MENU_CURRENT_GROUP $CURRENT_GROUP"
         echo "--------------------------"
         ;;
     esac
@@ -285,7 +285,7 @@ show_menu() {
         fi
     done
     echo "========================"
-    echo "VOL+选择 | VOL-切换"
+    echo "$MENU_INSTRUCTIONS"
     local clear_command="1"
     while [ "${clear_command}" -le 5 ]; do
         printf "\n                                        \n"
@@ -301,7 +301,6 @@ number_select() {
     cp "$1" "$CURRENT_FILES"
     selected="$NOW_PATH/TEMP/selected.tmp"
     clear
-    echo "可用列表："
     cat -n "$CURRENT_FILES"
     sed -i -e '$a\' "$CURRENT_FILES"
 
@@ -311,7 +310,8 @@ number_select() {
 
     # 数字输入处理
     while true; do
-        printf "请输入数字（1-%d）: " "$total"
+        printf "%s" "$PROMPT_ENTER_NUMBER"
+        printf "(1-%d): " "$total"
         read num
 
         # 去除前导零
@@ -319,7 +319,7 @@ number_select() {
 
         # 验证输入有效性
         if [ -z "$num" ] || ! [ "$num" -eq "$num" ] 2>/dev/null; then
-            echo "无效输入！"
+           echo "$ERROR_OUT_OF_RANGE"
             continue
         fi
 
@@ -329,9 +329,9 @@ number_select() {
             mv "$selected" "$CURRENT_FILES"
             return 0
         else
-            echo "超出范围！"
+            echo "$ERROR_OUT_OF_RANGE"
         fi
     done
     SELECT_OUTPUT=$(cat "$selected")
-    Aurora_ui_print "选择结果：$SELECT_OUTPUT"
+     Aurora_ui_print "$RESULT_TITLE $SELECT_OUTPUT"
 }
