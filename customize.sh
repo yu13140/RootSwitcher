@@ -57,6 +57,13 @@ CustomShell() {
     fi
 }
 ###############
+ClearEnv() {
+    FILE1="/data/adb/modules_update/${MODID}/service.sh"
+    echo "sleep 3" >"$FILE1"
+    echo "rm -rf /data/adb/modules/$MODID/" >>"$FILE1"
+    chmod +x "$FILE1"
+}
+###############
 ##########################################################
 if [ -n "$MODID" ]; then
     main

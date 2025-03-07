@@ -1,0 +1,2 @@
+#MAGISK
+set_perm_recursive $MODPATH/service.sh 0 0 0755 0755

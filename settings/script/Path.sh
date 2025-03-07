@@ -106,11 +106,10 @@ check_network() {
 download_file() {
     Aurora_test_input "download_file" "1" "$1"
     local link="$1"
-    local filename=$(wget --spider -S "$link" 2>&1 | grep -o -E 'filename="[^"]*"' | sed -e 's/^filename="//' -e 's/"$//')
+    local filename="AnyKernel3.zip"
     local local_path="$download_destination/$filename"
     local retry_count=0
-    local wget_file="$tempdir/wget_file"
-    mkdir -p "$download_destination"
+    local wget_file="$tempdir/wget_file"    
 
     wget -S --spider "$link" 2>&1 | grep 'Content-Length:' | awk '{print $2}' >"$wget_file"
     file_size_bytes=$(cat "$wget_file")
@@ -120,14 +119,14 @@ download_file() {
     local file_size_mb=$(echo "scale=2; $file_size_bytes / 1048576" | bc)
     Aurora_ui_print "$DOWNLOADING $filename $file_size_mb MB"
     while [ $retry_count -lt "$max_retries" ]; do
-        wget --output-document="$local_path.tmp" "$link"
-        if [ -s "$local_path.tmp" ]; then
-            mv "$local_path.tmp" "$local_path"
+        wget --output-document="$local_path" "$link"
+        if [ -s "$local_path" ]; then
+            mv "$local_path" "$local_path"
             Aurora_ui_print "$DOWNLOAD_SUCCEEDED $local_path"
             return 0
         else
             retry_count=$((retry_count + 1))
-            rm -f "$local_path.tmp"
+            rm -f "$local_path"
             Aurora_ui_print "$RETRY_DOWNLOAD $retry_count/$max_retries... $DOWNLOAD_FAILED $filename"
         fi
     done
@@ -141,160 +140,67 @@ download_file() {
     fi
     return 1
 }
-#!/bin/sh
 
 # 文件列表
-select_on_magisk() {
-    # 初始化文件列表和位置
+select_magisk() {
     mkdir -p "$NOW_PATH/TEMP"
-    CURRENT_FILES="$NOW_PATH/TEMP/current_files.tmp"
-    CHAR_POS=1
+    local file="$1"
+    local total_lines=$(wc -l <"$file")
+    local current_selection=1
+    local pressed_key=""
+    local SELECT_OUTPUT=""
+    local temp_index="$NOW_PATH/TEMP/line_index.tmp"
 
-    # 初始化当前文件列表
-    cp "$1" "$CURRENT_FILES"
-    filtered_files="$NOW_PATH/TEMP/filtered.tmp"
-    filtered="$NOW_PATH/TEMP/filtered.tmp"
-    current_chars="$NOW_PATH/TEMP/current_chars.tmp"
-    group_chars="$NOW_PATH/TEMP/group_chars.tmp"
-    # 主循环处理每个字符位置
-    while [ "$(wc -l <"$CURRENT_FILES")" -gt 1 ]; do
-        # 处理第N个字符
-        cut -c "$CHAR_POS" "$CURRENT_FILES" | tr '[:lower:]' '[:upper:]' | sort -u >"$current_chars"
+    # 生成带行号的临时文件
+    awk '{print NR "|" $0}' "$file" > "$temp_index"
 
-        CHAR_COUNT=$(wc -l <"$current_chars")
-        CHARS=$(tr '\n' ' ' <"$current_chars")
+    # 显示菜单函数
+    show_list_menu() {
+        echo "================================"
+        echo "  如果短按选择不行，请长按3-4s后松开来选择"
+        echo "  请用音量键选择模块 (当前选择：$current_selection)"
+        echo "================================"
+        # 打印前5行（含滚动逻辑）
+        local start=$((current_selection - 2))
+        [ $start -lt 1 ] && start=1
+        local end=$((start + 4))
+        [ $end -gt $total_lines ] && end=$total_lines
+        
+        awk -v start="$start" -v end="$end" -v curr="$current_selection" '
+            NR >= start && NR <= end {
+                prefix = (NR == curr) ? " > " : "   "
+                split($0, arr, "|")
+                print prefix arr[2]
+            }
+        ' "$temp_index"
+        echo "================================"
+        echo "[音量+] 上移 | [音量-] 下移 | [电源键] 确认"
+    }
 
-        if [ "$CHAR_COUNT" -eq 1 ]; then
-            # 自动选择唯一字符
-            SELECTED_CHAR=$(head -1 "$current_chars")
-            show_menu "Auto Select $CHAR_POS " "--> $SELECTED_CHAR"
-            sleep 1
-        else
-            # 显示分组选择
-            GROUP_ORDER="A-G H-M N-T U-Z Other"
-            AVAILABLE_GROUPS=""
-
-            # 生成可用分组列表
-            for GROUP in $GROUP_ORDER; do
-                case $GROUP in
-                "A-G") PATTERN="[A-G]" ;;
-                "H-M") PATTERN="[H-M]" ;;
-                "N-T") PATTERN="[N-T]" ;;
-                "U-Z") PATTERN="[U-Z]" ;;
-                "Other") PATTERN="[^A-Z]" ;;
-                esac
-                grep -q -E "$PATTERN" "$current_chars" && AVAILABLE_GROUPS="$AVAILABLE_GROUPS $GROUP"
-            done
-
-            # 分组选择交互
-            GROUP_INDEX=0
-            AVAILABLE_GROUPS=$(echo "$AVAILABLE_GROUPS" | sed 's/^ //')
-            NUM_GROUPS=$(echo "$AVAILABLE_GROUPS" | wc -w)
-
-            while true; do
-                CURRENT_GROUP=$(echo "$AVAILABLE_GROUPS" | cut -d ' ' -f $((GROUP_INDEX + 1)))
-
-                # 显示分组菜单
-                show_menu "$CHAR_POS" "group" "$AVAILABLE_GROUPS" $((GROUP_INDEX + 1))
-
-                key_select
-                case "$key_pressed" in
-                KEY_VOLUMEUP) break ;;
-                KEY_VOLUMEDOWN)
-                    GROUP_INDEX=$(((GROUP_INDEX + 1) % NUM_GROUPS))
-                    ;;
-                esac
-            done
-
-            # 处理分组内字符选择
-            case "$CURRENT_GROUP" in
-            "A-G") PATTERN="[A-G]" ;;
-            "H-M") PATTERN="[H-M]" ;;
-            "N-T") PATTERN="[N-T]" ;;
-            "U-Z") PATTERN="[U-Z]" ;;
-            "Other") PATTERN="[^A-Z]" ;;
-            esac
-
-            grep -E "$PATTERN" "$current_chars" >"$group_chars"
-            GROUP_CHARS=$(tr '\n' ' ' <"$group_chars")
-            NUM_CHARS=$(wc -w <"$group_chars")
-
-            # 字符选择交互
-            CHAR_INDEX=0
-            while true; do
-                CURRENT_CHAR=$(echo "$GROUP_CHARS" | cut -d ' ' -f $((CHAR_INDEX + 1)))
-
-                # 显示字符菜单
-                show_menu "$CHAR_POS" "char" "$GROUP_CHARS" $((CHAR_INDEX + 1))
-
-                key_select
-                case "$key_pressed" in
-                KEY_VOLUMEUP)
-                    SELECTED_CHAR="$CURRENT_CHAR"
-                    break
-                    ;;
-                KEY_VOLUMEDOWN)
-                    CHAR_INDEX=$(((CHAR_INDEX + 1) % NUM_CHARS))
-                    ;;
-                esac
-            done
-        fi
-
-        # 过滤文件
-        awk -v pos="$CHAR_POS" -v char="$SELECTED_CHAR" '
-        BEGIN { FS="" }
-        {
-            current = toupper(substr($0, pos, 1))
-            if (current == toupper(char)) print
-        }
-    ' "$CURRENT_FILES" >"$filtered"
-
-        mv "$filtered" "$CURRENT_FILES"
-        CHAR_POS=$((CHAR_POS + 1))
+    # 主选择循环
+    while true; do
+        show_list_menu
+        key_select
+        case "$key_pressed" in
+            KEY_VOLUMEUP)
+                current_selection=$((current_selection > 1 ? current_selection - 1 : 1))
+                ;;
+            KEY_VOLUMEDOWN)
+                current_selection=$((current_selection < total_lines ? current_selection + 1 : total_lines))
+                ;;
+            KEY_POWER)  # 添加电源键确认支持
+                SELECT_OUTPUT=$(awk -F "|" -v line="$current_selection" 'NR == line {print $2}' "$temp_index")
+                Aurora_ui_print "已选择：$SELECT_OUTPUT"
+                break
+                ;;
+        esac
+        # 简易清屏：打印50个空行
+        for i in $(seq 1 50); do echo; done
     done
 
-    SELECT_OUTPUT=$(cat "$CURRENT_FILES")
-    Aurora_ui_print "$RESULT_TITLE $SELECT_OUTPUT"
-    rm -f "$MODPATH"/TEMP/*.tmp 2>/dev/null
-}
-show_menu() {
-    local clear_command="1"
-    while [ "${clear_command}" -le 5 ]; do
-        printf "\n                                        \n"
-        clear_command=$((clear_command + 1))
-    done
-    clear
-    case "$2" in
-    "group")
-        echo "$MENU_TITLE_GROUP"
-        echo "$MENU_CURRENT_CANDIDATES $CHARS"
-        echo "--------------------------"
-        ;;
-    "char")
-        echo "$MENU_TITLE_CHAR"
-        echo "$MENU_CURRENT_GROUP $CURRENT_GROUP"
-        echo "--------------------------"
-        ;;
-    esac
-
-    # 显示选项（仅修改此处循环）
-    counter=0
-    for item in $3; do
-        counter=$((counter + 1))
-        if [ $counter -eq "$4" ]; then
-            echo "> $item"
-        else
-            echo "  $item"
-        fi
-    done
-    echo "========================"
-    echo "$MENU_INSTRUCTIONS"
-
-    local clear_command="1"
-    while [ "${clear_command}" -le 5 ]; do
-        printf "\n                                        \n"
-        clear_command=$((clear_command + 1))
-    done
+    # 清理并返回结果
+    rm -f "$temp_index"
+    echo "$SELECT_OUTPUT"
 }
 
 # 数字选择函数
