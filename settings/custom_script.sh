@@ -9,11 +9,35 @@ MODDIR=${0%/*}
 . "$MODPATH/settings/settings.sh"
 . "$MODPATH/$script_path"
 
-CPUINFO="$(cat /proc/cpuinfo | grep Hardware | awk '{ print $3 }')"
 KERNEL_VER="$(uname -r | cut -d "." -f1,2)"
-if [[ $CPUINFO != "Qualcomm" ]]; then
-    Aurora_abort "不支持非骁龙处理器！"
+
+ddQualcomm() {
+platform=$(getprop ro.board.platform 2>/dev/null)
+if echo "$platform" | grep -qiE '^(msm|apq|qsd)'; then
+    Aurora_ui_print "检测到高通处理器（平台：$platform）"
+    return
 fi
+hardware=$(getprop ro.hardware 2>/dev/null)
+[ -z "$hardware" ] && hardware=$(getprop ro.boot.hardware 2>/dev/null)
+if echo "$hardware" | grep -qi 'qcom'; then
+    Aurora_ui_print "检测到高通处理器（硬件：$hardware）" 
+    return   
+fi
+if grep -qiE 'qualcomm|qcom' /proc/cpuinfo 2>/dev/null; then
+    Aurora_ui_print "检测到高通处理器（来自/proc/cpuinfo）"  
+    return  
+fi
+if [ -f /system/build.prop ]; then
+    if grep -qiE 'qualcomm|qcom' /system/build.prop 2>/dev/null; then
+        Aurora_ui_print "检测到高通处理器（来自/system/build.prop）"  
+        return      
+    fi
+fi
+
+Aurora_abort "未检测到高通处理器"
+}
+
+ddQualcomm
 
 if [[ ! -d "/dev/block/by-name" ]]; then   
     SITE="/dev/block/bootdevice/by-name"
