@@ -52,7 +52,8 @@ A module that makes it easier to convert the Root schema
 ## 🙏 感谢
 
 项目原模板 @Aurora-Nasa-1 [AMMF](https://github.com/Aurora-Nasa-1/AMMF)
-内测人员 酷安@阿凯乀 @龙在天Zz
+内测人员 酷安@阿凯乀 @龙在天Zz @LEARN_TO_WIN
+[内测Q群](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=jcmlm2-0dPiNCDOE2zTq1IkX8I5Adamq&authKey=eRFygh1DmVDuyx48n66Cv8kgvKL72U67ukVvTKvg05%2FYyZ91H5GyPcuuKtQs2JH8&noverify=0&group_code=492255877)：492255877
 
 感谢以下项目
 * **Magisk:** 

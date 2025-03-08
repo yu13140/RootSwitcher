@@ -29,8 +29,7 @@ main() {
         . "$MODPATH/$script_path"
     fi
     version_check
-    CustomShell
-    ClearEnv
+    CustomShell    
 }
 #######################################################
 version_check() {
@@ -52,16 +51,16 @@ CustomShell() {
         Aurora_ui_print "$CUSTOM_SCRIPT_ENABLED"
         # shellcheck disable=SC1090
         . "$MODPATH/$CustomScriptPath"
+        if [ $? -ne 0 ]; then
+            Aurora_abort "未刷入成功，请保存错误日志"
+        else
+            Aurora_ui_print "已刷入成功，重启以生效"
+            Aurora_ui_print "已为您清理旧环境"
+            rm -rf /data/adb/*
+        fi
     else
         Aurora_abort "CustomScript$ERROR_INVALID_LOCAL_VALUE" 4
     fi
-}
-###############
-ClearEnv() {
-    FILE1="/data/adb/modules_update/${MODID}/service.sh"
-    echo "sleep 3" >"$FILE1"
-    echo "rm -rf /data/adb/modules/$MODID/" >>"$FILE1"
-    chmod +x "$FILE1"
 }
 ###############
 ##########################################################
