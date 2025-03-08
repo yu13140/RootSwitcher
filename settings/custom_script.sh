@@ -67,7 +67,7 @@ if [[ $BOOTAB = "true" ]]; then
             Aurora_ui_print "未检测到设备目前处于哪个槽位，请选择你需要刷入的槽位"
             Aurora_ui_print "音量上：刷入a槽                       音量下：刷入b槽$RE"
             echo "a" > $MODPATH/ab.txt ; echo "b" >> $MODPATH/ab.txt
-            select_on_magisk "$MODPATH/ab.txt"
+            select_magisk "$MODPATH/ab.txt"
             case $SELECT_OUTPUT in 
             a) 
             position=$(ls -l $SITE/boot_a | awk '{print $NF}') ;;
@@ -190,7 +190,7 @@ fi
 }
 
 if [[ -z "$APATCH" ]] && [[ -z "$KSU" ]] && [[ -n "$MAGISK_VER_CODE" ]]; then    
-    VERSION="($MAGISK_VER_CODE)"
+    VERSION="$MAGISK_VER_CODE"
     not_magisk="false"
     if echos "$MAGISK_VER" | grep -qi "kitsune"; then
         Aurora_ui_print "您正在使用Kitsune Mask($VERSION)"
@@ -207,7 +207,7 @@ if [[ -z "$APATCH" ]] && [[ -z "$KSU" ]] && [[ -n "$MAGISK_VER_CODE" ]]; then
     fi
 elif [[ -n "$APATCH" ]] && [[ -n "$BOOTMODE" ]]; then    
     APATCH_NEXT_VERSIONS="11008 11010 11021"
-    VERSION="($APATCH_VER_CODE)"
+    VERSION="$APATCH_VER_CODE"
     not_magisk="apatch"
     if echos " $APATCH_NEXT_VERSIONS " | grep -q " $VERSION "; then
         Aurora_ui_print "您正在使用APatch Next($VERSION)"        
@@ -226,7 +226,7 @@ elif [[ -n "$APATCH" ]] && [[ -n "$BOOTMODE" ]]; then
         Aurora_abort "未找到你的APatch，请确认是否安装了APatch管理器"
     fi
 elif [[ -n $KSU ]] && [[ -n $BOOTMODE ]]; then
-    VERSION="($KSU_VER_CODE)"
+    VERSION="$KSU_VER_CODE"
     not_magisk="ksu"
     if [[ -d /data/data/com.rifsxd.ksunext ]]; then
         Aurora_ui_print "您正在使用KernelSU Next($VERSION)"
@@ -243,7 +243,7 @@ fi
 
 Aurora_ui_print "选择你需要切换的Root方案"
 Aurora_ui_print "目前不支持MKSU与Magisk v28.1的转换"
-select_on_magisk "$MODPATH/bin/rootlist.conf"
+select_magisk "$MODPATH/bin/rootlist.conf"
 CheckPartition
 if [[ $SELECT_OUTPUT = "$whichroot" ]]; then
     if [[ ! $VERSION = $newest_version ]]; then
