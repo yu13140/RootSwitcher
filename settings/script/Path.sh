@@ -197,10 +197,8 @@ select_magisk() {
         # 简易清屏：打印50个空行
         for i in $(seq 1 50); do echo; done
     done
-
-    # 清理并返回结果
-    rm -f "$temp_index"
-    echo "$SELECT_OUTPUT"
+      
+    echo "$SELECT_OUTPUT" > "$MODPATH/select.txt"
 }
 
 # 数字选择函数

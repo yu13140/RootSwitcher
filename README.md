@@ -1,10 +1,10 @@
 <div align="center"> 
   
 # RootSwitcher
-A module that makes it easier to convert the Root schema
- Support mutual conversion of Magisk and its branches, APatch, LKM modes of KSU and its Next.
-(Experimental feature) Common kernel GKI mode for KernelSU v1.0.3
-(Future goal: support GKI mode conversion of lower version KSU and its Next)
+* A module that makes it easier to convert the Root schema
+* Support mutual conversion of Magisk and its branches, APatch, LKM modes of KSU and its Next.
+* (Experimental feature) Common kernel GKI mode for KernelSU v1.0.3
+* (Future goal: support GKI mode conversion of lower version KSU and its Next)
 
 [项目模板](https://github.com/Aurora-Nasa-1/AMMF)  [原版readme](https://github.com/yu13140/RootSwitcher/Document/README.md) 
   
@@ -16,15 +16,16 @@ A module that makes it easier to convert the Root schema
   
 ## ✍🏼 介绍
 
-一个更方便地转化Root方案的模块 
-支持Magisk及其分支，APatch，KSU及其Next的LKM模式互相转化
-(实验性功能)转换为KernelSUv1.0.3的通用内核GKI模式
-(未来目标：支持低版本KSU及其Next的GKI模式转换)
+* 一个更方便地转化Root方案的模块 
+* 支持Magisk及其分支，APatch，KSU及其Next的LKM模式互相转化
+* (实验性功能)转换为KernelSUv1.0.3的通用内核GKI模式
+* (未来目标：支持低版本KSU及其Next的GKI模式转换)
 
 ## ❗ 注意
 
-1.不支持非骁龙处理器的设备
+1.不支持非高通处理器的设备
    - 高通处理器实现Root更繁琐，我们建议您从线刷或卡刷开始Root实现
+   - 如果您是非高通处理器，但是想试试此模块，请注释/settings/custom_script.sh里的ddQualcomm函数(我们将不为刷入此模块的后果负任何责任)
 
 2.KernelSU用户(与其Next)请谨慎使用此模块
    - 当前，我们对KernelSU仍有很多疑惑
@@ -43,10 +44,12 @@ A module that makes it easier to convert the Root schema
 1.从本项目的Release里下载RootSwitcher.zip
 
 2.在当前的Root管理器中刷入此模块
-   - 如果当前设备支持A/B分区，在开始转换Root方案之前，请选择修补的boot.img应该刷入A分区还是B分区 (音量键上：A分区；音量键下：B分区)
+   - 在多数情况下，模块不需要用户提供原boot或init_boot镜像
    - 模块运行过程中，您需要选择转换成哪个Root方案，或是升级当前设备上的Root管理器
    - 对于想要转换为APatch的用户，我们把超级密钥设置成了a1234567，刷入后可以在APatch管理器中更改超级密钥
-
+   - 模块支持自定义需要修补的boot或init_boot(把img镜像放入/data/RootSwitcher/文件夹📁)
+   - 模块会备份原boot或init_boot到/data/RootSwitcher/文件夹📁
+   
 3.enjoy ^_^♪
 
 ## 🙏 感谢
