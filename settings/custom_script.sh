@@ -32,36 +32,46 @@ if [[ -d /data/RootSwitcher ]]; then
         fi
     fi
     readonly bootkind="$(basename $myboot .img)"
-    mv $myboot new-boot.img
+    mv $myboot boot.img
 fi
 }
 
 ddcleanup() {
 cleanround() {
     if [[ $not_magisk = "ksu" ]]; then
-        echo "rm -rf /data/adb/ksu /data/adb/ksud" > /data/adb/service.d/RootSwitcher.sh
+        echo "rm -rf /data/adb/ksu /data/adb/ksud" >> /data/adb/service.d/RootSwitcher.sh
     elif [[ $not_magisk = "apatch" ]]; then
-        echo "rm -rf /data/adb/ap/ /data/adb/apd" > /data/adb/service.d/RootSwitcher.sh
+        echo "rm -rf /data/adb/ap/ /data/adb/apd" >> /data/adb/service.d/RootSwitcher.sh
     elif [[ $not_magisk = "false" ]]; then
-        echo "rm -rf /data/adb/magisk/ /data/adb/magisk.db" > /data/adb/service.d/RootSwitcher.sh
+        echo "rm -rf /data/adb/magisk/ /data/adb/magisk.db" >> /data/adb/service.d/RootSwitcher.sh
     fi
 }
 if [[ $? -eq 0 ]]; then
     if [[ $SELECT_OUTPUT = "APatch"* ]]; then
         echo "if [ -n "$APATCH" ];then" > /data/adb/service.d/RootSwitcher.sh
-        cleanround
-        echo "fi" > /data/adb/service.d/RootSwitcher.sh
+        cleanround        
     elif [[ $SELECT_OUTPUT = "KernelSU"* ]]; then
         echo "if [ -n "$KSU" ];then" > /data/adb/service.d/RootSwitcher.sh
-        cleanround
-        echo "fi"  > /data/adb/service.d/RootSwitcher.sh
+        cleanround        
     else
         echo "if [ -z "$APATCH" ]&&[ -z "$KSU" ]&&[ -n "$MAGISK_VER_CODE" ];then" > /data/adb/service.d/RootSwitcher.sh
-        cleanround
-        echo "fi" > /data/adb/service.d/RootSwitcher.sh
+        cleanround        
     fi
+    echo "rm -rf /data/adb/modules/*" >> /data/adb/service.d/RootSwitcher.sh
+    echo "fi" >> /data/adb/service.d/RootSwitcher.sh
 else
     Aurora_abort "刷入失败！"   
+fi
+}
+
+installmagisk() {
+chmod -R 755 $MODPATH/bin/magisk/
+if [ $notmagisk = "false" ]; then
+    magisk --install-module $1
+elif [ $notmagisk = "apatch" ]; then
+    /data/adb/apd module install $1    
+elif [ $notmagisk = "ksu" ]; then
+    /data/adb/ksud module install $1
 fi
 }
 
@@ -125,6 +135,7 @@ else
 fi
 
 foundboot() {
+searchmy
 FBOOT="$MODPATH/boot.img"
 cd $MODPATH
 chmod 755 ./bin/magiskboot
@@ -197,6 +208,33 @@ else
         fi                                 
     fi    
 fi
+}
+
+gkiforksu() {
+android_version=$(getprop ro.build.version.release | cut -d. -f1)
+        mm_kernel_version=$(uname -r | cut -d- -f1)
+        match_string="android${android_version}-${mm_kernel_version}"
+        line_number=$(grep -nx "$match_string" $1.conf | cut -d: -f1)
+        if [ -n "$line_number" ]; then
+            if [[ "$bootkind" != "boot" ]]; then
+                mv -f boot.img init_boot.img                 
+                dd if=init_boot.img of="$position" bs=4M
+                dd if=boot"$Partition_location" of="$MODPATH/new-boot.img" bs=4M
+            fi
+            giturl=$(sed -n "${line_number}p" $MODPATH/bin/$2.conf)
+            download_file "$giturl"
+            cd $MODPATH
+            unzip -o "./AnyKernel3.zip"
+            ./bin/magiskboot unpack new-boot.img
+            mv -f Image kernel
+            ./bin/magiskboot repack new-boot.img
+        else
+            if [[ "$bootkind" != "init_boot" ]]; then
+                Aurora_abort "设备上备份的boot好像不是init_boot.img呢！"
+            fi
+            chmod -R 755 $PATCH_PATH
+            $PATCH_PATH/ksud boot-patch -b boot.img --magiskboot $MODPATH/bin/magiskboot
+        fi
 }
 
 CheckPartition() {
@@ -282,37 +320,13 @@ ddbootpatch() {
             Aurora_abort "在转换之前，请先安装KSU管理器！"
         fi        
         PATCH_PATH="$MODPATH/bin/KSU/"
-        foundboot
-        
-        android_version=$(getprop ro.build.version.release | cut -d. -f1)
-        mm_kernel_version=$(uname -r | cut -d- -f1)
-        match_string="android${android_version}-${mm_kernel_version}"
-        line_number=$(grep -nx "$match_string" kernel.conf | cut -d: -f1)
-        if [ -n "$line_number" ]; then
-            if [[ "$bootkind" != "boot" ]]; then
-                mv -f boot.img init_boot.img                 
-                dd if=init_boot.img of="$position" bs=4M
-                dd if=boot"$Partition_location" of="$MODPATH/new-boot.img" bs=4M
-            fi
-            giturl=$(sed -n "${line_number}p" $MODPATH/bin/kernelurl.conf)
-            download_file "https://github.proxy.class3.fun/$giturl"
-            cd $MODPATH
-            unzip -o "./AnyKernel3.zip"
-            ./bin/magiskboot unpack new-boot.img
-            mv -f Image kernel
-            ./bin/magiskboot repack new-boot.img    
-        else
-            if [[ "$bootkind" != "init_boot" ]]; then
-                Aurora_abort "设备上备份的boot好像不是init_boot.img呢！"
-            fi
-            chmod -R 755 $PATCH_PATH
-            $PATCH_PATH/ksud boot-patch -b boot.img --magiskboot $MODPATH/bin/magiskboot
-        fi            
-            mv -f new-boot.img boot.img        
-            sleep 2
-            ./bin/magiskboot cleanup
-            dd if=boot.img of="$position" bs=4M
-            ddcleanup     
+        foundboot        
+        gkiforksu "kernel.conf" "kernelurl.conf"                     
+        mv -f new-boot.img boot.img        
+        sleep 2
+        ./bin/magiskboot cleanup
+        dd if=boot.img of="$position" bs=4M
+        ddcleanup     
     elif [[ $SELECT_OUTPUT = "KernelSUNext" ]]; then
         if [[ `echo "5.1 > $KERNEL_VER" | bc` -eq 1 ]]; then
             Aurora_abort "你的内核版本不太适合KSU NEXT呢，或许你需要自己编译"
@@ -322,11 +336,7 @@ ddbootpatch() {
         fi        
         PATCH_PATH="$MODPATH/bin/KSUNEXT/"
         foundboot
-        if [[ "$bootkind" != "init_boot" ]]; then
-            Aurora_abort "设备上备份的boot好像不是init_boot.img呢！"
-        fi
-        chmod -R 755 $PATCH_PATH
-        $PATCH_PATH/ksud boot-patch -b boot.img --magiskboot $MODPATH/bin/magiskboot       
+        gkiforksu "nextkernel.conf" "nexturl.conf"                     
         mv -f new-boot.img boot.img
         sleep 2
         ./bin/magiskboot cleanup
@@ -335,36 +345,30 @@ ddbootpatch() {
     elif [[ $SELECT_OUTPUT = "MagiskAlpha" ]]; then
         if [[ ! -d /data/data/io.github.vvb2060.magisk ]]; then
             Aurora_abort "在转换之前，请先安装Magisk Alpha管理器！"
-        fi    
-        PATCH_PATH="$MODPATH/bin/Magisk/Alpha/boot_patch.sh"
+        fi            
         foundboot
-        ddbootinit boot.img                  
-        if [[ "$bootkind" != "$magiskneedboot" ]]; then
-            Aurora_abort "设备上备份的boot好像不是Magisk想要的呢！"
-        fi
-        chmod -R 755 $PATCH_PATH
-        $PATCH_PATH "$FBOOT"
-        sleep 2             
-        mv -f "./bin/Magisk/Alpha/new-boot.img" ./boot.img
-        ./bin/magiskboot cleanup
         dd if=boot.img of="$position" bs=4M
+        installmagisk ./bin/magisk/alpha.zip
+        sleep 2
         ddcleanup
     elif [[ $SELECT_OUTPUT = "KitsuneMask" ]]; then
         if [[ ! -d /data/data/io.github.huskydg.magisk ]]; then
             Aurora_abort "在转换之前，请先安装Kitsune Mask管理器！"
         fi    
-        PATCH_PATH="$MODPATH/bin/Magisk/Delta/boot_patch.sh"
-        foundboot
-        ddbootinit boot.img
-        if [[ "$bootkind" != "$magiskneedboot" ]]; then
-            Aurora_abort "设备上备份的boot好像不是Magisk想要的呢！"
-        fi        
-        chmod -R 755 $PATCH_PATH
-        $PATCH_PATH "$FBOOT"
-        sleep 2      
-        mv -f ./bin/Magisk/Delta/new-boot.img boot.img
-        ./bin/magiskboot cleanup
+        PATCH_PATH="$MODPATH/bin/Magisk/delta.zip"
+        foundboot              
         dd if=boot.img of="$position" bs=4M
+        installmagisk ./bin/magisk/delta.zip                        
+        sleep 2              
+        ddcleanup
+    elif [[ $SELECT_OUTPUT = "Magisk" ]]; then
+        if [[ ! -d /data/data/com.topjohnwu.magisk ]]; then
+            Aurora_abort "在转换之前，请先安装Magisk管理器！"
+        fi            
+        foundboot
+        dd if=boot.img of="$position" bs=4M
+        installmagisk ./bin/magisk/magisk.zip
+        sleep 2
         ddcleanup
     else
         Aurora_abort "你未选择任意管理器！"  

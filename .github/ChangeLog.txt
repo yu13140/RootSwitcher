@@ -1,0 +1,5 @@
+* 修复了转换为**Magisk**全系的问题(测试中)
+* 添加转化为**KenrelSU Next_GKI模式**
+* (以后将不会再更新KenrelSU Next的GKI内核)
+* 使用CDN加速下载GKI内核
+* 修复了一些小问题，优化了部分代码

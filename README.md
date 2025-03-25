@@ -3,8 +3,8 @@
 # RootSwitcher
 * A module that makes it easier to convert the Root schema
 * Support mutual conversion of Magisk and its branches, APatch, LKM modes of KSU and its Next.
-* (Experimental feature) Common kernel GKI mode for KernelSU v1.0.3
-* (Future goal: support GKI mode conversion of lower version KSU and its Next)
+* (Experimental feature) GKI mode for KernelSU v1.0.3
+* (Experimental feature) GKI mode for KernelSU Next v1.0.5
 
 [项目模板](https://github.com/Aurora-Nasa-1/AMMF)  [原版readme](https://github.com/yu13140/RootSwitcher/Document/README.md) 
   
@@ -18,8 +18,8 @@
 
 * 一个更方便地转化Root方案的模块 
 * 支持Magisk及其分支，APatch，KSU及其Next的LKM模式互相转化
-* (实验性功能)转换为KernelSUv1.0.3的通用内核GKI模式
-* (未来目标：支持低版本KSU及其Next的GKI模式转换)
+* (实验性功能)转换为KernelSU v1.0.3的GKI模式
+* (实验性功能)转化为KernelSU Next v1.0.5的GKI模式
 
 ## ❗ 注意
 

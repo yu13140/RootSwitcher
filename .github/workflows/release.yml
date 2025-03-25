@@ -1,0 +1,35 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Compress into zip
+      run: | 
+        cd $GITHUB_WORKSPACE       
+        zip -r RootSwitcher.zip $GITHUB_WORKSPACE/ -x $GITHUB_WORKSPACE/.github
+    
+    - name: Set TAG_NAME
+      run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      
+    - name: Compress into zip
+      run: | 
+        cd $GITHUB_WORKSPACE       
+        zip -r RootSwitcher_$TAG_NAME.zip $GITHUB_WORKSPACE/ -x $GITHUB_WORKSPACE/.github        
+                    
+    - name: Upload Zip
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.TAG_NAME }}
+        files: RootSwitcher_$TAG_NAME.zip
+        body_path: $GITHUB_WORKSPACE/.github/ChangeLog.txt
