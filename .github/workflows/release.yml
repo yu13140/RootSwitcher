@@ -28,4 +28,4 @@ jobs:
       with:
         tag_name: ${{ env.TAG_NAME }}
         files: RootSwitcher_v2.3.0_development.zip
-        body_path: $GITHUB_WORKSPACE/ChangeLog.txt
+        body_path: ChangeLog.txt
