@@ -163,7 +163,7 @@ select_magisk() {
         # 打印前5行（含滚动逻辑）
         local start=$((current_selection - 2))
         [ $start -lt 1 ] && start=1
-        local end=$((start + 4))
+        local end=$((start + 8))
         [ $end -gt $total_lines ] && end=$total_lines
         
         awk -v start="$start" -v end="$end" -v curr="$current_selection" '

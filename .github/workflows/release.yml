@@ -11,12 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Compress into zip
-      run: | 
-        cd $GITHUB_WORKSPACE       
-        zip -r RootSwitcher.zip $GITHUB_WORKSPACE/ -x $GITHUB_WORKSPACE/.github
+      uses: actions/checkout@v4       
     
     - name: Set TAG_NAME
       run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
@@ -24,13 +19,13 @@ jobs:
     - name: Compress into zip
       run: | 
         cd $GITHUB_WORKSPACE       
-        zip -r RootSwitcher_$TAG_NAME.zip $GITHUB_WORKSPACE/ -x $GITHUB_WORKSPACE/.github        
-                    
+        zip -r RootSwitcher_v2.3.0_development.zip ./ -x "./.github/*" -x "./.git/*"  
+        wget https://raw.githubusercontent.com/yu13140/RootSwitcher/refs/heads/main/.github/ChangeLog.txt            
     - name: Upload Zip
       uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ env.TAG_NAME }}
-        files: RootSwitcher_$TAG_NAME.zip
-        body_path: $GITHUB_WORKSPACE/.github/ChangeLog.txt
+        files: RootSwitcher_v2.3.0_development.zip
+        body_path: $GITHUB_WORKSPACE/ChangeLog.txt

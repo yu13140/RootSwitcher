@@ -1,6 +1,6 @@
 id=RootSwitcher
 name=RootSwitcher
-version=v1.0test
-versionCode=20250307
+version=v2.3.0_development
+versionCode=20250526
 author=yu13140
 description=Support mutual conversion of Magisk and its branches, APatch, LKM modes of KSU and its Next                        支持Magisk及其分支，APatch，KSU及其Next的LKM模式互相转化

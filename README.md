@@ -5,8 +5,9 @@
 * Support mutual conversion of Magisk and its branches, APatch, LKM modes of KSU and its Next.
 * (Experimental feature) GKI mode for KernelSU v1.0.3
 * (Experimental feature) GKI mode for KernelSU Next v1.0.5
+* (Experimental feature) GKI mode for SukiSU_Ultra 12926
 
-[项目模板](https://github.com/Aurora-Nasa-1/AMMF)  [原版readme](https://github.com/yu13140/RootSwitcher/Document/README.md) 
+[项目模板](https://github.com/Aurora-Nasa-1/AMMF)  [Original Readme](https://github.com/yu13140/RootSwitcher/raw/refs/heads/main/Document/README_EN.md) 
   
  <img src="https://img.shields.io/github/license/Aurora-Nasa-1/AMMF" alt="GitHub License">  
   
@@ -17,9 +18,10 @@
 ## ✍🏼 介绍
 
 * 一个更方便地转化Root方案的模块 
-* 支持Magisk及其分支，APatch，KSU及其Next的LKM模式互相转化
+* 支持Magisk，APatch，KSU_LKM模式互相转化
 * (实验性功能)转换为KernelSU v1.0.3的GKI模式
 * (实验性功能)转化为KernelSU Next v1.0.5的GKI模式
+* (实验性功能)转化为SukiSU_Ultra 12926的GKI模式
 
 ## ❗ 注意
 
@@ -27,7 +29,7 @@
    - 高通处理器实现Root更繁琐，我们建议您从线刷或卡刷开始Root实现
    - 如果您是非高通处理器，但是想试试此模块，请注释/settings/custom_script.sh里的ddQualcomm函数(我们将不为刷入此模块的后果负任何责任)
 
-2.KernelSU用户(与其Next)请谨慎使用此模块
+2.KernelSU用户请谨慎使用此模块
    - 当前，我们对KernelSU仍有很多疑惑
    - 如果你正在使用KernelSU，我们或许需要你的帮助
    
@@ -65,10 +67,13 @@ https://github.com/topjohnwu/Magisk
 https://t.me/magiskalpha  
 * **Kitsune Mask (Magisk Delta):**  
 https://github.com/KitsuneMagisk/Magisk  
-https://github.com/HuskyDG/magisk-files  
+https://github.com/HuskyDG/magisk-files
+https://github.com/1q23lyc45/KitsuneMagisk
 * **APatch:** 
 https://github.com/bmax121/APatch  
 * **APatch Next:**  
 https://t.me/app_process64  
 * **KernelSU:**
-https://github.com/tiann/KernelSU  
+https://github.com/tiann/KernelSU
+* **SukiSU_Ultra:**
+https://github.com/SukiSU-Ultra/SukiSU-Ultra

@@ -1,5 +1,9 @@
 * 修复了转换为**Magisk**全系的问题(测试中)
-* 添加转化为**KenrelSU Next_GKI模式**
-* (以后将不会再更新KenrelSU Next的GKI内核)
-* 使用CDN加速下载GKI内核
+* 添加转化为**SukiSU_Ultra 12926_GKI模式**
+* 支持转化为**SukiSU_Ultra的LKM模式**
 * 修复了一些小问题，优化了部分代码
+***
+* Fixed conversion to Magisk full system (in testing)
+* Add Convert to SukiSU_Ultra 12926_GKI mode
+* Support for LKM mode conversion to SukiSU_Ultra
+* Fixed some minor issues and optimized some code
